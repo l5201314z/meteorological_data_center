@@ -17,7 +17,7 @@ int main(int argc,char *argv[])
     printf("        /project/tools1/bin/procctl 300 /project/tools1/bin/gzipfiles /tmp/idc/surfdata \"*.xml,*.json\" 0.01\n\n");
 
     printf("这是一个工具程序，用于压缩历史的数据文件或日志文件。\n");
-    printf("本程序把pathname目录及子目录中timeout天之前的匹配matchstr文件全部压缩,timeout可以是小数。\n");
+    printf("本程序把pathname目录及子目录中timeout天之前的匹配matchstr文件全部压缩，timeout可以是小数。\n");
     printf("本程序不写日志文件，也不会在控制台输出任何信息。\n");
     printf("本程序调用/usr/bin/gzip命令压缩文件。\n\n\n");
 
@@ -27,7 +27,7 @@ int main(int argc,char *argv[])
   // 关闭全部的信号和输入输出。
   // 设置信号,在shell状态下可用 "kill + 进程号" 正常终止些进程。
   // 但请不要用 "kill -9 +进程号" 强行终止。
-  // CloseIOAndSignal(true); signal(SIGINT,EXIT);  signal(SIGTERM,EXIT);
+  CloseIOAndSignal(true); signal(SIGINT,EXIT);  signal(SIGTERM,EXIT);
 
   // 获取文件超时的时间点。
   char strTimeOut[21];
@@ -49,20 +49,15 @@ int main(int argc,char *argv[])
     if (Dir.ReadDir()==false) break;
   
     // 与超时的时间点比较，如果更早，就需要压缩
-      printf("Dir1=%s\n",Dir.m_ModifyTime);
-      printf("Dir2=%s\n",Dir.m_CreateTime);
-      printf("time=%s\n",strTimeOut);
     if ( (strcmp(Dir.m_ModifyTime,strTimeOut)<0) && (MatchStr(Dir.m_FileName,"*.gz")==false) )
     {
       // 压缩文件，调用操作系统的gzip命令。
       SNPRINTF(strCmd,sizeof(strCmd),1000,"gzip -f %s 1>/dev/null 2>/dev/null",Dir.m_FullFileName);
       //execl execv system
-      printf("cmd=%s\n",strCmd);
-      //printf("Dir=%s\n\n",Dir.m_ModifyTime);
-      if (system(strCmd)==0)
-         printf("gzip %s ok.\n",Dir.m_FullFileName);
+      if (system(strCmd)==0) 
+        printf("gzip %s ok.\n",Dir.m_FullFileName);
       else
-         printf("gzip %s failed.\n",Dir.m_FullFileName);
+        printf("gzip %s failed.\n",Dir.m_FullFileName);
     }
   }
 
@@ -71,7 +66,7 @@ int main(int argc,char *argv[])
 
 void EXIT(int sig)
 {
-  printf("程序退出，sig=%d\n\n",sig);
+  printf("程序退出,sig=%d\n\n",sig);
 
   exit(0);
 }
