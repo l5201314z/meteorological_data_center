@@ -22,6 +22,6 @@ deletefiles:deletefiles.cpp
 	g++ $(CFLAGS) -o deletefiles  deletefiles.cpp $(PUBINCL) $(PUBCPP) -lm -lc
 	cp deletefiles ../bin/.
 ftpgetfiles:ftpgetfiles.cpp
-	g++ -g -o ftpgetfiles ftpgetfiles.cpp /project/public/_ftp.cpp  /project/public/_public.cpp -I/project/public -L/project/public -lftp -lm -lc
+	g++ -g -o ftpgetfiles ftpgetfiles.cpp /project/public/_ftp.cpp  /project/public/_public.cpp -I/project/public -L/project/public -lftp -lm -lc -g
 clean:
 	rm -f procctl checkproc gzipfiles deletefiles ftpgetfiles

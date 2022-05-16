@@ -63,9 +63,9 @@ int main(int argc,char const *argv[]){
         // 如果参数非法，给出帮助文档。
         printf("Using:./crtsurfdata inifile outpath logfile datafmt [datetime]\n");
         printf("Example:\
-        /project/idc1/bin/crtsurfdata /project/idc1/ini/stcode.ini  /project/tmp/idc/surfdata /log/idc/crtsurfdata.log xml,json,csv\n\n");
+        /project/idc1/bin/crtsurfdata /project/idc1/ini/stcode.ini  /tmp/idc/surfdata /log/idc/crtsurfdata.log xml,json,csv\n\n");
         printf("Example:\
-        /project/idc1/bin/crtsurfdata /project/idc1/ini/stcode.ini  /project/tmp/idc/surfdata /log/idc/crtsurfdata.log xml,json,csv  20210520052030\n\n");
+        /project/idc1/bin/crtsurfdata /project/idc1/ini/stcode.ini  /tmp/idc/surfdata /log/idc/crtsurfdata.log xml,json,csv  20210520052030\n\n");
 
         printf("inifile 全国气象站点参数文件名。\n");
         printf("outpath 全国气象站点数据文件存放的目录。\n");
