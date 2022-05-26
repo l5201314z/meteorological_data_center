@@ -11,7 +11,9 @@ struct st_arg
   char localpath[301];     // 本地文件存放的目录。
   char matchname[101];     // 待下载文件匹配的规则。
   char listfilename[301];  // 下载前列出服务器文件名的文件。
-} starg;
+  int  ptype;              // 下载后服务器文件的处理方式：1-什么也不做；2-删除；3-备份。
+  char remotepathbak[301]; // 下载后服务器文件的备份目录。
+} starg; 
 
 struct st_fileinfo{
     char filename[301]; //文件名
@@ -103,26 +105,28 @@ bool LoadListFile(){
     {
       memset(&stfileinfo,0,sizeof(stfileinfo));
 
-      if(File.Fgets(stfileinfo.filename,300,true)==false)break;
+      if(File.Fgets(stfileinfo.filename,300,true)==false)break;  //一次读取一行数据
+
+      if(MatchStr(stfileinfo.filename,starg.matchname)==false) continue;
 
       vfilelist.push_back(stfileinfo);
     }
 
     //遍历容器vfilelist
-    char strremotefilename[301],strlocalfilename[301];
+    char strremotefilename[301]; //下载服务器全路径文件名
+    char strlocalfilename[301];  //下载文件本地全路径文件名
     for (int i = 0; i < vfilelist.size(); i++)
     {
-        SNPRINTF(strremotefilename,sizeof(strremotefilename),300,"%s%s",starg.remotepath,vfilelist[i].filename);
-        SNPRINTF(strlocalfilename,sizeof(strlocalfilename),300,"%s%s",starg.localpath,vfilelist[i].filename);
+        SNPRINTF(strremotefilename,sizeof(strremotefilename),300,"%s/%s",starg.remotepath,vfilelist[i].filename);
+        SNPRINTF(strlocalfilename,sizeof(strlocalfilename),300,"%s/%s",starg.localpath,vfilelist[i].filename);
         //调用ftp.get()方法从服务器下载文件
-        logfile.WriteEx("%s \n",strremotefilename);
-        logfile.WriteEx("%s \n",strlocalfilename);
-        logfile.Write("get %s ... \n",strremotefilename);
+        logfile.Write("get %s ... ",strremotefilename);
+
         if(ftp.get(strremotefilename,strlocalfilename) == false){
             logfile.WriteEx("failed ... \n",strremotefilename);break;
         }
-        logfile.WriteEx("get %s ok ... \n",strremotefilename);
 
+        logfile.WriteEx("ok.\n");
     }
 
     return true;
@@ -196,5 +200,17 @@ bool _xmltoarg(char *strxmlbuffer)
   GetXMLBuffer(strxmlbuffer,"listfilename",starg.listfilename,300);   // 下载前列出服务器文件名的文件。
   if (strlen(starg.listfilename)==0)
   { logfile.Write("listfilename is null.\n");  return false;}
+
+  // 下载后服务器文件的处理方式：1-什么也不做；2-删除；3-备份。
+  GetXMLBuffer(strxmlbuffer,"ptype",&starg.ptype);   
+  if ( (starg.ptype!=1) && (starg.ptype!=2) && (starg.ptype!=3) )
+  { logfile.Write("ptype is error.\n"); return false; }
+
+  GetXMLBuffer(strxmlbuffer,"remotepathbak",starg.remotepathbak,300); // 下载后服务器文件的备份目录。
+  if ( (starg.ptype==3) && (strlen(starg.remotepathbak)==0) )
+  { logfile.Write("remotepathbak is null.\n");  return false; }
+
+
+
   return true;
 }
