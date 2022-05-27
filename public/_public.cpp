@@ -1386,7 +1386,7 @@ time_t strtotime(const char *stime)
   time_str.tm_year = atoi(yyyy) - 1900;
   time_str.tm_mon = atoi(mm) - 1;
   time_str.tm_mday = atoi(dd);
-  time_str.tm_hour = atoi(hh)-1;  //备注: 2022
+  time_str.tm_hour = atoi(hh);  //备注: 2022
   time_str.tm_min = atoi(mi);
   time_str.tm_sec = atoi(ss);
   time_str.tm_isdst = 0;
