@@ -23,9 +23,9 @@ deletefiles:deletefiles.cpp
 	cp deletefiles ../bin/.
 ftpgetfiles:ftpgetfiles.cpp
 	g++ $(CFLAGS) -o ftpgetfiles ftpgetfiles.cpp /project/public/_ftp.cpp  /project/public/_public.cpp -I/project/public -L/project/public -lftp -lm -lc
-	cp checkproc ../bin/.
+	cp ftpgetfiles ../bin/.
 ftpputfiles:ftpputfiles.cpp
 	g++ $(CFLAGS) -o ftpputfiles ftpputfiles.cpp /project/public/_ftp.cpp  /project/public/_public.cpp -I/project/public -L/project/public -lftp -lm -lc
-	cp checkproc ../bin/.
+	cp ftpputfiles ../bin/.
 clean:
 	rm -f procctl checkproc gzipfiles deletefiles ftpgetfiles ftpputfiles

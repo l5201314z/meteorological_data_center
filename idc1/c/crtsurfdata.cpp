@@ -77,7 +77,7 @@ int main(int argc,char const *argv[]){
     // 关闭全部的信号和输入输出。
     // 设置信号,在shell状态下可用 "kill + 进程号" 正常终止些进程。
     // 但请不要用 "kill -9 +进程号" 强行终止。
-    //CloseIOAndSignal(true); signal(SIGINT,EXIT);  signal(SIGTERM,EXIT);
+    CloseIOAndSignal(true); signal(SIGINT,EXIT);  signal(SIGTERM,EXIT);
 
     if(logfile.Open(argv[3]) == false){
         printf("logfile.Open(%s) faild .\n",argv[3]);return -1;
@@ -94,7 +94,6 @@ int main(int argc,char const *argv[]){
     memset(strddatetime,0,sizeof(strddatetime));
     if(argc==5){
         LocalTime(strddatetime,"yyyymmddhh24miss");
-        printf("strddatetime%s\n",strddatetime);
     }else{
         STRCPY(strddatetime,sizeof(strddatetime),argv[5]);
     }

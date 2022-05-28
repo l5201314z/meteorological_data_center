@@ -39,7 +39,7 @@ int main(int argc,char *argv[])
   int  socklen=sizeof(struct sockaddr_in); // struct sockaddr_in的大小
   struct sockaddr_in clientaddr;  // 客户端的地址信息。
   clientfd=accept(listenfd,(struct sockaddr *)&clientaddr,(socklen_t*)&socklen);
-  printf("客户端（%s）已连接。\n",inet_ntoa(clientaddr.sin_addr));
+  printf("客户端 (%s)已连接。\n",inet_ntoa(clientaddr.sin_addr));
  
   int iret;
   char buffer[1024];

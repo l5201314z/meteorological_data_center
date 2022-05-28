@@ -25,7 +25,7 @@ int main(int argc,char *argv[])
     printf("TcpServer.Accept() failed.\n"); return -1;
   }
 
-  printf("客户端（%s）已连接。\n",TcpServer.GetIP());
+  printf("客户端 (%s)已连接。\n",TcpServer.GetIP());
 
   char buffer[102400];
 

@@ -1,5 +1,4 @@
-all:demo01 demo02 demo03 demo04 demo05 demo06 demo07 demo08 demo10 demo11 demo12\
-    demo13 demo14 demo31 demo32 demo33 demo20 demo26 demo27
+all:demo01 demo02 demo03 demo04 demo05 demo06 demo07 demo08
 
 demo01:demo01.cpp
 	g++ -g -o demo01 demo01.cpp -lm -lc

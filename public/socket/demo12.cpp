@@ -151,6 +151,7 @@ bool srv001(const char *strrecvbuffer,char *strsendbuffer)
   GetXMLBuffer(strrecvbuffer,"password",password,30);
 
   // 处理业务。
+  
   // 把处理结果生成strsendbuffer。
   if ( (strcmp(tel,"1392220000")==0) && (strcmp(password,"123456")==0) )
   {

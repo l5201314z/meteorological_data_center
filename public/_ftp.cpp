@@ -108,7 +108,8 @@ bool Cftp::mtime(const char *remotefilename)
 
   if (FtpModDate(remotefilename,strmtime,14,m_ftpconn) == false) return false;
 
-  AddTime(strmtime,m_mtime,0+8*60*60,"yyyymmddhh24miss");
+  //AddTime(strmtime,m_mtime,0+8*60*60,"yyyymmddhh24miss");
+  AddTime(strmtime,m_mtime,0,"yyyymmddhh24miss");
 
   return true;
 }
