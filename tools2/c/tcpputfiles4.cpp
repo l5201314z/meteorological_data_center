@@ -1,5 +1,5 @@
 /*
- * 程序名：tcpputfiles.cpp，采用tcp协议，实现文件上传的客户端。
+ * 程序名：tcpputfiles.cpp,采用tcp协议,实现文件上传的客户端。
  * 作者：吴从周。
 */
 #include "_public.h"
@@ -7,18 +7,18 @@
 // 程序运行的参数结构体。
 struct st_arg
 {
-  int  clienttype;          // 客户端类型，1-上传文件；2-下载文件。
+  int  clienttype;          // 客户端类型,1-上传文件；2-下载文件。
   char ip[31];              // 服务端的IP地址。
   int  port;                // 服务端的端口。
   int  ptype;               // 文件上传成功后本地文件的处理方式：1-删除文件；2-移动到备份目录。
   char clientpath[301];     // 本地文件存放的根目录。
-  char clientpathbak[301];  // 文件成功上传后，本地文件备份的根目录，当ptype==2时有效。
-  bool andchild;            // 是否上传clientpath目录下各级子目录的文件，true-是；false-否。
-  char matchname[301];      // 待上传文件名的匹配规则，如"*.TXT,*.XML"。
+  char clientpathbak[301];  // 文件成功上传后,本地文件备份的根目录,当ptype==2时有效。
+  bool andchild;            // 是否上传clientpath目录下各级子目录的文件,true-是；false-否。
+  char matchname[301];      // 待上传文件名的匹配规则,如"*.TXT,*.XML"。
   char srvpath[301];        // 服务端文件存放的根目录。
-  int  timetvl;             // 扫描本地目录文件的时间间隔，单位：秒。
+  int  timetvl;             // 扫描本地目录文件的时间间隔,单位：秒。
   int  timeout;             // 进程心跳的超时时间。
-  char pname[51];           // 进程名，建议用"tcpputfiles_后缀"的方式。
+  char pname[51];           // 进程名,建议用"tcpputfiles_后缀"的方式。
 } starg;
 
 CLogFile logfile;
@@ -40,7 +40,7 @@ bool ActiveTest();    // 心跳。
 char strrecvbuffer[1024];   // 发送报文的buffer。
 char strsendbuffer[1024];   // 接收报文的buffer。
 
-// 文件上传的主函数，执行一次文件上传的任务。
+// 文件上传的主函数,执行一次文件上传的任务。
 bool _tcpputfiles();
 
 // 把文件的内容发送给对端。
@@ -63,10 +63,10 @@ int main(int argc,char *argv[])
   // 打开日志文件。
   if (logfile.Open(argv[1],"a+")==false)
   {
-    printf("打开日志文件失败（%s）。\n",argv[1]); return -1;
+    printf("打开日志文件失败 (%s)。\n",argv[1]); return -1;
   }
 
-  // 解析xml，得到程序运行的参数。
+  // 解析xml,得到程序运行的参数.
   if (_xmltoarg(argv[2])==false) return -1;
 
   // PActive.AddPInfo(starg.timeout,starg.pname);  // 把进程的心跳信息写入共享内存。
@@ -82,7 +82,7 @@ int main(int argc,char *argv[])
 
   while (true)
   {
-    // 调用文件上传的主函数，执行一次文件上传的任务。
+    // 调用文件上传的主函数,执行一次文件上传的任务。
     if (_tcpputfiles()==false) { logfile.Write("_tcpputfiles() failed.\n"); EXIT(-1); }
 
     sleep(starg.timetvl);
@@ -129,7 +129,7 @@ bool Login(const char *argv)
 
 void EXIT(int sig)
 {
-  logfile.Write("程序退出，sig=%d\n\n",sig);
+  logfile.Write("程序退出,sig=%d\n\n",sig);
 
   exit(0);
 }
@@ -142,20 +142,20 @@ void _help()
   printf("Sample:/project/tools1/bin/procctl 20 /project/tools1/bin/tcpputfiles /log/idc/tcpputfiles_surfdata.log \"<ip>192.168.174.132</ip><port>5005</port><ptype>1</ptype><clientpath>/tmp/tcp/surfdata1</clientpath><clientpathbak>/tmp/tcp/surfdata1bak</clientpathbak><andchild>true</andchild><matchname>*.XML,*.CSV</matchname><srvpath>/tmp/tcp/surfdata2</srvpath><timetvl>10</timetvl><timeout>50</timeout><pname>tcpputfiles_surfdata</pname>\"\n");
   printf("       /project/tools1/bin/procctl 20 /project/tools1/bin/tcpputfiles /log/idc/tcpputfiles_surfdata.log \"<ip>192.168.174.132</ip><port>5005</port><ptype>2</ptype><clientpath>/tmp/tcp/surfdata1</clientpath><clientpathbak>/tmp/tcp/surfdata1bak</clientpathbak><andchild>true</andchild><matchname>*.XML,*.CSV</matchname><srvpath>/tmp/tcp/surfdata2</srvpath><timetvl>10</timetvl><timeout>50</timeout><pname>tcpputfiles_surfdata</pname>\"\n\n\n");
 
-  printf("本程序是数据中心的公共功能模块，采用tcp协议把文件发送给服务端。\n");
+  printf("本程序是数据中心的公共功能模块,采用tcp协议把文件发送给服务端。\n");
   printf("logfilename   本程序运行的日志文件。\n");
-  printf("xmlbuffer     本程序运行的参数，如下：\n");
+  printf("xmlbuffer     本程序运行的参数,如下：\n");
   printf("ip            服务端的IP地址。\n");
   printf("port          服务端的端口。\n");
-  printf("ptype         文件上传成功后的处理方式：1-删除文件；2-移动到备份目录。\n");
+  printf("ptype         文件上传成功后的处理方式: 1-删除文件; 2-移动到备份目录。\n");
   printf("clientpath    本地文件存放的根目录。\n");
-  printf("clientpathbak 文件成功上传后，本地文件备份的根目录，当ptype==2时有效。\n");
-  printf("andchild      是否上传clientpath目录下各级子目录的文件，true-是；false-否，缺省为false。\n");
-  printf("matchname     待上传文件名的匹配规则，如\"*.TXT,*.XML\"\n");
+  printf("clientpathbak 文件成功上传后,本地文件备份的根目录,当ptype==2时有效。\n");
+  printf("andchild      是否上传clientpath目录下各级子目录的文件,true-是; false-否,缺省为false。\n");
+  printf("matchname     待上传文件名的匹配规则,如\"*.TXT,*.XML\"\n");
   printf("srvpath       服务端文件存放的根目录。\n");
-  printf("timetvl       扫描本地目录文件的时间间隔，单位：秒，取值在1-30之间。\n");
-  printf("timeout       本程序的超时时间，单位：秒，视文件大小和网络带宽而定，建议设置50以上。\n");
-  printf("pname         进程名，尽可能采用易懂的、与其它进程不同的名称，方便故障排查。\n\n");
+  printf("timetvl       扫描本地目录文件的时间间隔,单位：秒,取值在1-30之间。\n");
+  printf("timeout       本程序的超时时间,单位：秒,视文件大小和网络带宽而定,建议设置50以上。\n");
+  printf("pname         进程名,尽可能采用易懂的、与其它进程不同的名称,方便故障排查。\n\n");
 }
 
 // 把xml解析到参数starg结构
@@ -189,11 +189,11 @@ bool _xmltoarg(char *strxmlbuffer)
   GetXMLBuffer(strxmlbuffer,"timetvl",&starg.timetvl);
   if (starg.timetvl==0) { logfile.Write("timetvl is null.\n"); return false; }
 
-  // 扫描本地目录文件的时间间隔，单位：秒。
+  // 扫描本地目录文件的时间间隔,单位：秒。
   // starg.timetvl没有必要超过30秒。
   if (starg.timetvl>30) starg.timetvl=30;
 
-  // 进程心跳的超时时间，一定要大于starg.timetvl，没有必要小于50秒。
+  // 进程心跳的超时时间,一定要大于starg.timetvl,没有必要小于50秒。
   GetXMLBuffer(strxmlbuffer,"timeout",&starg.timeout);
   if (starg.timeout==0) { logfile.Write("timeout is null.\n"); return false; }
   if (starg.timeout<50) starg.timeout=50;
@@ -204,7 +204,7 @@ bool _xmltoarg(char *strxmlbuffer)
   return true;
 }
 
-// 文件上传的主函数，执行一次文件上传的任务。
+// 文件上传的主函数,执行一次文件上传的任务。
 bool _tcpputfiles()
 {
   CDir Dir;
@@ -220,10 +220,10 @@ bool _tcpputfiles()
     memset(strsendbuffer,0,sizeof(strsendbuffer));
     memset(strrecvbuffer,0,sizeof(strrecvbuffer));
 
-    // 遍历目录中的每个文件，调用ReadDir()获取一个文件名。
+    // 遍历目录中的每个文件,调用ReadDir()获取一个文件名。
     if (Dir.ReadDir()==false) break;
 
-    // 把文件名、修改时间、文件大小组成报文，发送给对端。
+    // 把文件名、修改时间、文件大小组成报文,发送给对端。
     SNPRINTF(strsendbuffer,sizeof(strsendbuffer),1000,"<filename>%s</filename><mtime>%s</mtime><size>%d</size>",Dir.m_FullFileName,Dir.m_ModifyTime,Dir.m_FileSize);
 
     // logfile.Write("strsendbuffer=%s\n",strsendbuffer);
@@ -274,7 +274,7 @@ bool SendFile(const int sockfd,const char *filename,const int filesize)
   {
     memset(buffer,0,sizeof(buffer));
 
-    // 计算本次应该读取的字节数，如果剩余的数据超过1000字节，就打算读1000字节。
+    // 计算本次应该读取的字节数,如果剩余的数据超过1000字节,就打算读1000字节。
     if (filesize-totalbytes>1000) onread=1000;
     else onread=filesize-totalbytes;
 
@@ -287,7 +287,7 @@ bool SendFile(const int sockfd,const char *filename,const int filesize)
       if (Writen(sockfd,buffer,bytes)==false) { fclose(fp); return false; }
     }
 
-    // 计算文件已读取的字节总数，如果文件已读完，跳出循环。
+    // 计算文件已读取的字节总数,如果文件已读完,跳出循环。
     totalbytes=totalbytes+bytes;
 
     if (totalbytes==filesize) break;
@@ -310,16 +310,16 @@ bool AckMessage(const char *strrecvbuffer)
   GetXMLBuffer(strrecvbuffer,"filename",filename,300);
   GetXMLBuffer(strrecvbuffer,"result",result,10);
 
-  // 如果服务端接收文件不成功，直接返回。
+  // 如果服务端接收文件不成功,直接返回。
   if (strcmp(result,"ok")!=0) return true;
 
-  // ptype==1，删除文件。
+  // ptype==1,删除文件。
   if (starg.ptype==1)
   {
     if (REMOVE(filename)==false) { logfile.Write("REMOVE(%s) failed.\n",filename); return false; }
   }
   
-  // ptype==2，移动到备份目录。
+  // ptype==2,移动到备份目录。
   if (starg.ptype==2)
   {
     // 生成转存后的备份目录文件名。

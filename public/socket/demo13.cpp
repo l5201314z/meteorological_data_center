@@ -36,7 +36,6 @@ int main(int argc,char *argv[])
   for (int ii=3;ii<5;ii++)
   {
     if (srv000()==false) break;
-
     sleep(ii);
   }
 

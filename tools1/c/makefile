@@ -27,5 +27,13 @@ ftpgetfiles:ftpgetfiles.cpp
 ftpputfiles:ftpputfiles.cpp
 	g++ $(CFLAGS) -o ftpputfiles ftpputfiles.cpp /project/public/_ftp.cpp  /project/public/_public.cpp -I/project/public -L/project/public -lftp -lm -lc
 	cp ftpputfiles ../bin/.
+
+tcpputfiles:tcpputfiles.cpp
+	g++ $(CFLAGS) -o tcpputfiles tcpputfiles.cpp $(PUBINCL) $(PUBCPP) -lm -lc
+	cp tcpputfiles ../bin/.
+
+fileserver:fileserver.cpp
+	g++ $(CFLAGS) -o fileserver fileserver.cpp $(PUBINCL) $(PUBCPP) -lm -lc
+	cp fileserver ../bin/.
 clean:
-	rm -f procctl checkproc gzipfiles deletefiles ftpgetfiles ftpputfiles
+	rm -f procctl checkproc gzipfiles deletefiles ftpgetfiles ftpputfiles tcpputfiles fileserver
