@@ -1,5 +1,5 @@
 /*
- * 程序名：fileserver.cpp，文件传输的服务端。
+ * 程序名：fileserver.cpp,文件传输的服务端。
  * 作者：吴从周
 */
 #include "_public.h"
@@ -7,18 +7,18 @@
 // 程序运行的参数结构体。
 struct st_arg
 {
-  int  clienttype;          // 客户端类型，1-上传文件；2-下载文件。
+  int  clienttype;          // 客户端类型,1-上传文件；2-下载文件。
   char ip[31];              // 服务端的IP地址。
   int  port;                // 服务端的端口。
   int  ptype;               // 文件上传成功后文件的处理方式：1-删除文件；2-移动到备份目录。
   char clientpath[301];     // 本地文件存放的根目录。
-  char clientpathbak[301];  // 文件成功上传后，本地文件备份的根目录，当ptype==2时有效。
-  bool andchild;            // 是否上传clientpath目录下各级子目录的文件，true-是；false-否。
-  char matchname[301];      // 待上传文件名的匹配规则，如"*.TXT,*.XML"。
+  char clientpathbak[301];  // 文件成功上传后,本地文件备份的根目录,当ptype==2时有效。
+  bool andchild;            // 是否上传clientpath目录下各级子目录的文件,true-是；false-否。
+  char matchname[301];      // 待上传文件名的匹配规则,如"*.TXT,*.XML"。
   char srvpath[301];        // 服务端文件存放的根目录。
-  int  timetvl;             // 扫描本地目录文件的时间间隔，单位：秒。
+  int  timetvl;             // 扫描本地目录文件的时间间隔,单位：秒。
   int  timeout;             // 进程心跳的超时时间。
-  char pname[51];           // 进程名，建议用"tcpgetfiles_后缀"的方式。
+  char pname[51];           // 进程名,建议用"tcpgetfiles_后缀"的方式。
 } starg;
 
 // 把xml解析到参数starg结构中。
@@ -67,7 +67,7 @@ int main(int argc,char *argv[])
       logfile.Write("TcpServer.Accept() failed.\n"); FathEXIT(-1);
     }
 
-    logfile.Write("客户端（%s）已连接。\n",TcpServer.GetIP());
+    logfile.Write("客户端 (%s)已连接。\n",TcpServer.GetIP());
 
     /*
     if (fork()>0) { TcpServer.CloseClient(); continue; }  // 父进程继续回到Accept()。
@@ -78,15 +78,15 @@ int main(int argc,char *argv[])
     TcpServer.CloseListen();
     */
 
-    // 子进程与客户端进行通讯，处理业务。
+    // 子进程与客户端进行通讯,处理业务。
 
     // 处理登录客户端的登录报文。
     if (ClientLogin()==false) ChldEXIT(-1);
 
-    // 如果clienttype==1，调用上传文件的主函数。
+    // 如果clienttype==1,调用上传文件的主函数。
     if (starg.clienttype==1) RecvFilesMain();
 
-    // 如果clienttype==2，调用下载文件的主函数。
+    // 如果clienttype==2,调用下载文件的主函数。
 
     ChldEXIT(0);
   }
@@ -98,7 +98,7 @@ void FathEXIT(int sig)
   // 以下代码是为了防止信号处理函数在执行的过程中被信号中断。
   signal(SIGINT,SIG_IGN); signal(SIGTERM,SIG_IGN);
 
-  logfile.Write("父进程退出，sig=%d。\n",sig);
+  logfile.Write("父进程退出,sig=%d。\n",sig);
 
   TcpServer.CloseListen();    // 关闭监听的socket。
 
@@ -113,7 +113,7 @@ void ChldEXIT(int sig)
   // 以下代码是为了防止信号处理函数在执行的过程中被信号中断。
   signal(SIGINT,SIG_IGN); signal(SIGTERM,SIG_IGN);
 
-  logfile.Write("子进程退出，sig=%d。\n",sig);
+  logfile.Write("子进程退出,sig=%d。\n",sig);
 
   TcpServer.CloseClient();    // 关闭客户端的socket。
 
@@ -155,7 +155,7 @@ bool _xmltoarg(char *strxmlbuffer)
 {
   memset(&starg,0,sizeof(struct st_arg));
 
-  // 不需要对参数做合法性判断，客户端已经判断过了。
+  // 不需要对参数做合法性判断,客户端已经判断过了。
   GetXMLBuffer(strxmlbuffer,"clienttype",&starg.clienttype);
   GetXMLBuffer(strxmlbuffer,"ptype",&starg.ptype);
   GetXMLBuffer(strxmlbuffer,"clientpath",starg.clientpath);
@@ -184,7 +184,7 @@ void RecvFilesMain()
     memset(strrecvbuffer,0,sizeof(strrecvbuffer));
 
     // 接收客户端的报文。
-    // 第二个参数的取值必须大于starg.timetvl，小于starg.timeout。
+    // 第二个参数的取值必须大于starg.timetvl,小于starg.timeout。
     if (TcpServer.Read(strrecvbuffer,starg.timetvl+10)==false)
     {
       logfile.Write("TcpServer.Read() failed.\n"); return;
@@ -201,7 +201,6 @@ void RecvFilesMain()
         logfile.Write("TcpServer.Write() failed.\n"); return;
       }
     }
-
     // 处理上传文件的请求报文。
   }
 

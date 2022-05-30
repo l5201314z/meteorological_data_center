@@ -7,8 +7,8 @@ PUBCPP = /project/public/_public.cpp
 #编译参数
 CFLAGS = -g
 
-all: procctl checkproc gzipfiles deletefiles ftpgetfiles ftpputfiles
-#all:  ftpgetfiles
+#all: procctl checkproc gzipfiles deletefiles ftpgetfiles ftpputfiles
+all: tcpputfiles1 fileserver1
 procctl:procctl.cpp
 	g++ -o procctl procctl.cpp
 	cp procctl ../bin/.
@@ -30,10 +30,16 @@ ftpputfiles:ftpputfiles.cpp
 
 tcpputfiles:tcpputfiles.cpp
 	g++ $(CFLAGS) -o tcpputfiles tcpputfiles.cpp $(PUBINCL) $(PUBCPP) -lm -lc
-	cp tcpputfiles ../bin/.
+	cp tcpputfiles1 ../bin/.
 
 fileserver:fileserver.cpp
 	g++ $(CFLAGS) -o fileserver fileserver.cpp $(PUBINCL) $(PUBCPP) -lm -lc
-	cp fileserver ../bin/.
+	cp fileserver1 ../bin/.
+
+tcpgetfiles:tcpgetfiles.cpp
+	g++ $(CFLAGS) -o tcpgetfiles tcpgetfiles.cpp $(PUBINCL) $(PUBCPP) -lm -lc
+	cp tcpgetfiles ../bin/.
+
 clean:
-	rm -f procctl checkproc gzipfiles deletefiles ftpgetfiles ftpputfiles tcpputfiles fileserver
+	rm -f procctl checkproc gzipfiles deletefiles ftpgetfiles ftpputfiles tcpputfiles
+	fileserver  tcpgetfiles
