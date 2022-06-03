@@ -1,6 +1,6 @@
 /**************************************************************************************/
-/*   ³ÌĞòÃû£º_mysql.cpp£¬´Ë³ÌĞòÊÇ¿ª·¢¿ò¼ÜµÄC/C++²Ù×÷mysqlÊı¾İ¿âµÄ¶¨ÒåÎÄ¼ş¡£           */
-/*   ×÷Õß£ºÎâ´ÓÖÜ¡£                                                                   */
+/*   ç¨‹åºåï¼š_mysql.cppï¼Œæ­¤ç¨‹åºæ˜¯å¼€å‘æ¡†æ¶çš„C/C++æ“ä½œmysqlæ•°æ®åº“çš„å®šä¹‰æ–‡ä»¶ã€‚           */
+/*   ä½œè€…ï¼šå´ä»å‘¨ã€‚                                                                   */
 /**************************************************************************************/
 
 #include "_mysql.h"
@@ -18,7 +18,7 @@ connection::connection()
   m_cda.rc=-1;
   strncpy(m_cda.message,"database not open.",128);
 
-  // Êı¾İ¿âÖÖÀà
+  // æ•°æ®åº“ç§ç±»
   memset(m_dbtype,0,sizeof(m_dbtype));
   strcpy(m_dbtype,"mysql");
 }
@@ -28,7 +28,7 @@ connection::~connection()
   disconnect();
 }
 
-// ´ÓconnstrÖĞ½âÎöusername,password,tnsname
+// ä»connsträ¸­è§£æusername,password,tnsname
 // "120.77.115.3","szidc","SZmb1601","lxqx",3306
 void connection::setdbopt(char *connstr)
 {
@@ -79,11 +79,11 @@ void connection::setdbopt(char *connstr)
 
 int connection::connecttodb(char *connstr,char *charset,unsigned int autocommitopt)
 {
-  // Èç¹ûÒÑÁ¬½ÓÉÏÊı¾İ¿â£¬¾Í²»ÔÙÁ¬½Ó
-  // ËùÒÔ£¬Èç¹ûÏëÖØÁ¬Êı¾İ¿â£¬±ØĞëÏÔÊ¾µÄµ÷ÓÃdisconnect()·½·¨ºó²ÅÄÜÖØÁ¬
+  // å¦‚æœå·²è¿æ¥ä¸Šæ•°æ®åº“ï¼Œå°±ä¸å†è¿æ¥ã€‚
+  // æ‰€ä»¥ï¼Œå¦‚æœæƒ³é‡è¿æ•°æ®åº“ï¼Œå¿…é¡»æ˜¾ç¤ºçš„è°ƒç”¨disconnect()æ–¹æ³•åæ‰èƒ½é‡è¿ã€‚
   if (m_state == 1) return 0;
 
-  // ´ÓconnstrÖĞ½âÎöusername,password,tnsname
+  // ä»connsträ¸­è§£æusername,password,tnsname
   setdbopt(connstr);
 
   memset(&m_cda,0,sizeof(m_cda));
@@ -98,7 +98,7 @@ int connection::connecttodb(char *connstr,char *charset,unsigned int autocommito
     m_cda.rc=mysql_errno(m_conn); strncpy(m_cda.message,mysql_error(m_conn),2000); mysql_close(m_conn); m_conn=NULL;  return -1;
   }
 
-  // ÉèÖÃÊÂÎñÄ£Ê½£¬0-¹Ø±Õ×Ô¶¯Ìá½»£¬1-¿ªÆô×Ô¶¯Ìá½»
+  // è®¾ç½®äº‹åŠ¡æ¨¡å¼ï¼Œ0-å…³é—­è‡ªåŠ¨æäº¤ï¼Œ1-å¼€å¯è‡ªåŠ¨æäº¤
   m_autocommitopt=autocommitopt;
 
   if ( mysql_autocommit(m_conn, m_autocommitopt ) != 0 )
@@ -106,15 +106,18 @@ int connection::connecttodb(char *connstr,char *charset,unsigned int autocommito
     m_cda.rc=mysql_errno(m_conn); strncpy(m_cda.message,mysql_error(m_conn),2000); mysql_close(m_conn); m_conn=NULL;  return -1;
   }
 
-  // ÉèÖÃ×Ö·û¼¯
+  // è®¾ç½®å­—ç¬¦é›†
   character(charset);
 
   m_state = 1;
 
+  // è®¾ç½®äº‹åŠ¡éš”ç¦»çº§åˆ«ä¸ºread committed
+  execute("set session transaction isolation level read committed");
+
   return 0;
 }
 
-// ÉèÖÃ×Ö·û¼¯£¬ÒªÓëÊı¾İ¿âµÄÒ»ÖÂ£¬·ñÔòÖĞÎÄ»á³öÏÖÂÒÂë
+// è®¾ç½®å­—ç¬¦é›†ï¼Œè¦ä¸æ•°æ®åº“çš„ä¸€è‡´ï¼Œå¦åˆ™ä¸­æ–‡ä¼šå‡ºç°ä¹±ç 
 void connection::character(char *charset)
 {
   if (charset==0) return;
@@ -230,21 +233,21 @@ sqlstatement::~sqlstatement()
 
 int sqlstatement::connect(connection *conn)
 {
-  // ×¢Òâ£¬Ò»¸ösqlstatementÔÚ³ÌĞòÖĞÖ»ÄÜÁ¬Ò»¸öconnection£¬²»ÔÊĞíÁ¬¶à¸öconnection
-  // ËùÒÔ£¬Ö»ÒªÕâ¸ö¹â±êÒÑ´ò¿ª£¬¾Í²»ÔÊĞíÔÙ´Î´ò¿ª£¬Ö±½Ó·µ»Ø³É¹¦
+  // æ³¨æ„ï¼Œä¸€ä¸ªsqlstatementåœ¨ç¨‹åºä¸­åªèƒ½ç»‘å®šä¸€ä¸ªconnectionï¼Œä¸å…è®¸ç»‘å®šå¤šä¸ªconnectionã€‚
+  // æ‰€ä»¥ï¼Œåªè¦è¿™ä¸ªsqlstatementå·²ç»‘å®šconnectionï¼Œç›´æ¥è¿”å›æˆåŠŸã€‚
   if ( m_state == 1 ) return 0;
   
   memset(&m_cda,0,sizeof(m_cda));
 
   m_conn=conn;
 
-  // Èç¹ûÊı¾İ¿âÁ¬½ÓÀàµÄÖ¸ÕëÎª¿Õ£¬Ö±½Ó·µ»ØÊ§°Ü
+  // å¦‚æœæ•°æ®åº“è¿æ¥ç±»çš„æŒ‡é’ˆä¸ºç©ºï¼Œç›´æ¥è¿”å›å¤±è´¥
   if (m_conn == 0)
   {
     m_cda.rc=-1; strncpy(m_cda.message,"database not open.\n",128); return -1;
   }
   
-  // Èç¹ûÊı¾İ¿âÃ»ÓĞÁ¬½ÓºÃ£¬Ö±½Ó·µ»ØÊ§°Ü
+  // å¦‚æœæ•°æ®åº“æ²¡æœ‰è¿æ¥å¥½ï¼Œç›´æ¥è¿”å›å¤±è´¥
   if (m_conn->m_state == 0)
   {
     m_cda.rc=-1; strncpy(m_cda.message,"database not open.\n",128); return -1;
@@ -255,7 +258,7 @@ int sqlstatement::connect(connection *conn)
     err_report(); return m_cda.rc;
   }
 
-  m_state = 1;  // ¹â±ê³É¹¦´ò¿ª
+  m_state = 1;  
 
   m_autocommitopt=m_conn->m_autocommitopt;
 
@@ -300,7 +303,7 @@ int connection::execute(const char *fmt,...)
 
 void sqlstatement::err_report()
 {
-  // ×¢Òâ£¬ÔÚ¸Ãº¯ÊıÖĞ£¬²»¿ÉËæÒâÓÃmemset(&m_cda,0,sizeof(m_cda))£¬·ñÔò»áÇå¿Õm_cda.rpcµÄÄÚÈİ
+  // æ³¨æ„ï¼Œåœ¨è¯¥å‡½æ•°ä¸­ï¼Œä¸å¯éšæ„ç”¨memset(&m_cda,0,sizeof(m_cda))ï¼Œå¦åˆ™ä¼šæ¸…ç©ºm_cda.rpcçš„å†…å®¹
   if (m_state == 0)
   {
     m_cda.rc=-1; strncpy(m_cda.message,"cursor not open.\n",128); return;
@@ -320,8 +323,8 @@ void sqlstatement::err_report()
   return;
 }
 
-// °Ñ×Ö·û´®ÖĞµÄĞ¡Ğ´×ÖÄ¸×ª»»³É´óĞ´£¬ºöÂÔ²»ÊÇ×ÖÄ¸µÄ×Ö·û¡£
-// Õâ¸öº¯ÊıÖ»ÔÚprepare·½·¨ÖĞÓÃµ½¡£
+// æŠŠå­—ç¬¦ä¸²ä¸­çš„å°å†™å­—æ¯è½¬æ¢æˆå¤§å†™ï¼Œå¿½ç•¥ä¸æ˜¯å­—æ¯çš„å­—ç¬¦ã€‚
+// è¿™ä¸ªå‡½æ•°åªåœ¨prepareæ–¹æ³•ä¸­ç”¨åˆ°ã€‚
 void MY__ToUpper(char *str)
 {
   if (str == 0) return;
@@ -336,8 +339,8 @@ void MY__ToUpper(char *str)
   }
 }
 
-// É¾³ı×Ö·û´®×ó±ßµÄ¿Õ¸ñ¡£
-// Õâ¸öº¯ÊıÖ»ÔÚprepare·½·¨ÖĞÓÃµ½¡£
+// åˆ é™¤å­—ç¬¦ä¸²å·¦è¾¹çš„ç©ºæ ¼ã€‚
+// è¿™ä¸ªå‡½æ•°åªåœ¨prepareæ–¹æ³•ä¸­ç”¨åˆ°ã€‚
 void MY__DeleteLChar(char *str,const char chr)
 {
   if (str == 0) return;
@@ -359,19 +362,19 @@ void MY__DeleteLChar(char *str,const char chr)
   return;
 }
 
-// ×Ö·û´®Ìæ»»º¯Êı
-// ÔÚ×Ö·û´®strÖĞ£¬Èç¹û´æÔÚ×Ö·û´®str1£¬¾ÍÌæ»»Îª×Ö·û´®str2¡£
-// Õâ¸öº¯ÊıÖ»ÔÚprepare·½·¨ÖĞÓÃµ½¡£
+// å­—ç¬¦ä¸²æ›¿æ¢å‡½æ•°
+// åœ¨å­—ç¬¦ä¸²strä¸­ï¼Œå¦‚æœå­˜åœ¨å­—ç¬¦ä¸²str1ï¼Œå°±æ›¿æ¢ä¸ºå­—ç¬¦ä¸²str2ã€‚
+// è¿™ä¸ªå‡½æ•°åªåœ¨prepareæ–¹æ³•ä¸­ç”¨åˆ°ã€‚
 void MY__UpdateStr(char *str,const char *str1,const char *str2,bool bloop)
 {
   if (str == 0) return;
   if (strlen(str) == 0) return;
   if ( (str1 == 0) || (str2 == 0) ) return;
 
-  // Èç¹ûbloopÎªtrue²¢ÇÒstr2ÖĞ°üº¯ÁËstr1µÄÄÚÈİ£¬Ö±½Ó·µ»Ø£¬ÒòÎª»á½øÈëËÀÑ­»·£¬×îÖÕµ¼ÖÂÄÚ´æÒç³ö¡£
+  // å¦‚æœbloopä¸ºtrueå¹¶ä¸”str2ä¸­åŒ…å‡½äº†str1çš„å†…å®¹ï¼Œç›´æ¥è¿”å›ï¼Œå› ä¸ºä¼šè¿›å…¥æ­»å¾ªç¯ï¼Œæœ€ç»ˆå¯¼è‡´å†…å­˜æº¢å‡ºã€‚
   if ( (bloop==true) && (strstr(str2,str1)>0) ) return;
 
-  // ¾¡¿ÉÄÜ·ÖÅä¸ü¶àµÄ¿Õ¼ä£¬µ«ÈÔÓĞ¿ÉÄÜ³öÏÖÄÚ´æÒç³öµÄÇé¿ö£¬×îºÃÓÅ»¯³Éstring¡£
+  // å°½å¯èƒ½åˆ†é…æ›´å¤šçš„ç©ºé—´ï¼Œä½†ä»æœ‰å¯èƒ½å‡ºç°å†…å­˜æº¢å‡ºçš„æƒ…å†µï¼Œæœ€å¥½ä¼˜åŒ–æˆstringã€‚
   int ilen=strlen(str)*10;
   if (ilen<1000) ilen=1000;
 
@@ -421,39 +424,39 @@ int sqlstatement::prepare(const char *fmt,...)
   vsnprintf(m_sql,10240,fmt,ap);
   va_end(ap);
 
-  int ilen=strlen(m_sql);
-
-  // ÎªÁËºÍoracle¼æÈİ£¬°Ñ:1,:2,:3...µÈÌæ»»³É?
-  for (int ii=0;ii<ilen;ii++)
+  // ä¸ºäº†å’Œoracleå…¼å®¹ï¼ŒæŠŠ:1,:2,:3...ç­‰æ›¿æ¢æˆ?
+  char strtmp[11]; 
+  for (int ii=MAXPARAMS;ii>0;ii--)
   {
-    if ( (m_sql[ii]==':') && (isdigit(m_sql[ii+1])!=0) )
-    {
-      m_sql[ii]='?';
-      m_sql[ii+1]=' ';
-      if (isdigit(m_sql[ii+2])!=0) m_sql[ii+2]=' ';
-      if (isdigit(m_sql[ii+3])!=0) m_sql[ii+3]=' ';
-    }
+    memset(strtmp,0,sizeof(strtmp));
+    snprintf(strtmp,10,":%d",ii);
+    MY__UpdateStr(m_sql,strtmp,"?",false);
   }
-
-  // ÎªÁËºÍoracle¼æÈİ
-  // °Ñto_date¹æÖÆ³Éstr_to_date¡£
-  // °Ñto_charÌæ»»³Édate_format¡£
+   
+  // ä¸ºäº†å’Œoracleå…¼å®¹
+  // æŠŠto_dateè§„åˆ¶æˆstr_to_dateã€‚
   if (strstr(m_sql,"str_to_date")==0) MY__UpdateStr(m_sql,"to_date","str_to_date",false);
+  // æŠŠto_charæ›¿æ¢æˆdate_formatã€‚
   MY__UpdateStr(m_sql,"to_char","date_format",false);
+  // æŠŠ"yyyy-mm-dd hh24:mi:ss"æ›¿æ¢æˆ"%Y-%m-%d %H:%i:%s"
   MY__UpdateStr(m_sql,"yyyy-mm-dd hh24:mi:ss","%Y-%m-%d %H:%i:%s",false);
+  // æŠŠ"yyyymmddhh24miss"æ›¿æ¢æˆ"%Y%m%d%H%i%s"
   MY__UpdateStr(m_sql,"yyyymmddhh24miss","%Y%m%d%H%i%s",false);
-  // ¸÷Î»Èç¹ûÏë¼æÈİoracleºÍmysql¸ü¶àµÄÊ±¼ä¸ñÊ½£¬¿ÉÒÔÔÚÕâÀï¼Ó´úÂë¡£
-  // Ò»¶¨Òª°Ñ¸ñÊ½Ò»Ò»ÁĞ³öÀ´£¬²»ÄÜÓÃ"yyyy"Ìæ»»"%Y"£¬ÒòÎªÔÚSQLÓï¾äµÄÆäËüµØ·½Ò²¿ÉÄÜ´æÔÚ"yyyy"¡£
+  // å¦‚æœæƒ³å…¼å®¹oracleå’Œmysqlæ›´å¤šçš„æ—¶é—´æ ¼å¼ï¼Œå¯ä»¥åœ¨è¿™é‡ŒåŠ ä»£ç ã€‚
+  // ä¸€å®šè¦æŠŠæ ¼å¼ä¸€ä¸€åˆ—å‡ºæ¥ï¼Œä¸èƒ½ç”¨"yyyy"æ›¿æ¢"%Y"ï¼Œå› ä¸ºåœ¨SQLè¯­å¥çš„å…¶å®ƒåœ°æ–¹ä¹Ÿå¯èƒ½å­˜åœ¨"yyyy"ã€‚
+
+  // æŠŠsysdateè§„åˆ¶æˆsysdate()ã€‚
+  if (strstr(m_sql,"sysdate()")==0) MY__UpdateStr(m_sql,"sysdate","sysdate()",false);
 
   if (mysql_stmt_prepare(m_handle,m_sql,strlen(m_sql)) != 0)
   {
-    err_report(); return m_cda.rc;
+    err_report(); memcpy(&m_cda1,&m_cda,sizeof(struct CDA_DEF)); return m_cda.rc;
   }
 
-  // ÅĞ¶ÏÊÇ·ñÊÇ²éÑ¯Óï¾ä£¬Èç¹ûÊÇ£¬°Ñm_sqltypeÉèÎª0£¬ÆäËüÓï¾äÉèÎª1¡£
+  // åˆ¤æ–­æ˜¯å¦æ˜¯æŸ¥è¯¢è¯­å¥ï¼Œå¦‚æœæ˜¯ï¼ŒæŠŠm_sqltypeè®¾ä¸º0ï¼Œå…¶å®ƒè¯­å¥è®¾ä¸º1ã€‚
   m_sqltype=1;
   
-  // ´Ó´ıÖ´ĞĞµÄSQLÓï¾äÖĞ½ØÈ¡30¸ö×Ö·û£¬Èç¹ûÊÇÒÔ"select"´òÍ·£¬¾ÍÈÏÎªÊÇ²éÑ¯Óï¾ä¡£
+  // ä»å¾…æ‰§è¡Œçš„SQLè¯­å¥ä¸­æˆªå–30ä¸ªå­—ç¬¦ï¼Œå¦‚æœæ˜¯ä»¥"select"æ‰“å¤´ï¼Œå°±è®¤ä¸ºæ˜¯æŸ¥è¯¢è¯­å¥ã€‚
   char strtemp[31]; memset(strtemp,0,sizeof(strtemp)); strncpy(strtemp,m_sql,30);
   MY__ToUpper(strtemp); MY__DeleteLChar(strtemp,' ');
   if (strncmp(strtemp,"SELECT",6)==0)  m_sqltype=0;
@@ -469,6 +472,11 @@ int sqlstatement::prepare(const char *fmt,...)
   
 int sqlstatement::bindin(unsigned int position,int *value)
 {
+  if (m_state == 0)
+  {
+    m_cda.rc=-1; strncpy(m_cda.message,"cursor not open.\n",128); return -1;
+  }
+
   if ( (position<1) || (position>=MAXPARAMS) || (position>m_handle->param_count) )
   {
     m_cda.rc=-1; strncpy(m_cda.message,"array bound.",128);
@@ -484,6 +492,11 @@ int sqlstatement::bindin(unsigned int position,int *value)
 
 int sqlstatement::bindin(unsigned int position,long *value)
 {
+  if (m_state == 0)
+  {
+    m_cda.rc=-1; strncpy(m_cda.message,"cursor not open.\n",128); return -1;
+  }
+
   if ( (position<1) || (position>=MAXPARAMS) || (position>m_handle->param_count) )
   {
     m_cda.rc=-1; strncpy(m_cda.message,"array bound.",128);
@@ -499,6 +512,11 @@ int sqlstatement::bindin(unsigned int position,long *value)
 
 int sqlstatement::bindin(unsigned int position,unsigned int *value)
 {
+  if (m_state == 0)
+  {
+    m_cda.rc=-1; strncpy(m_cda.message,"cursor not open.\n",128); return -1;
+  }
+
   if ( (position<1) || (position>=MAXPARAMS) || (position>m_handle->param_count) )
   {
     m_cda.rc=-1; strncpy(m_cda.message,"array bound.",128);
@@ -514,6 +532,11 @@ int sqlstatement::bindin(unsigned int position,unsigned int *value)
 
 int sqlstatement::bindin(unsigned int position,unsigned long *value)
 {
+  if (m_state == 0)
+  {
+    m_cda.rc=-1; strncpy(m_cda.message,"cursor not open.\n",128); return -1;
+  }
+
   if ( (position<1) || (position>=MAXPARAMS) || (position>m_handle->param_count) )
   {
     m_cda.rc=-1; strncpy(m_cda.message,"array bound.",128);
@@ -529,6 +552,11 @@ int sqlstatement::bindin(unsigned int position,unsigned long *value)
 
 int sqlstatement::bindin(unsigned int position,char *value,unsigned int len)
 {
+  if (m_state == 0)
+  {
+    m_cda.rc=-1; strncpy(m_cda.message,"cursor not open.\n",128); return -1;
+  }
+
   if ( (position<1) || (position>=MAXPARAMS) || (position>m_handle->param_count) )
   {
     m_cda.rc=-1; strncpy(m_cda.message,"array bound.",128);
@@ -544,8 +572,13 @@ int sqlstatement::bindin(unsigned int position,char *value,unsigned int len)
   return 0;
 }
 
-int sqlstatement::bindinlob(unsigned int position,void *buffer,unsigned long *filesize)
+int sqlstatement::bindinlob(unsigned int position,void *buffer,unsigned long *size)
 {
+  if (m_state == 0)
+  {
+    m_cda.rc=-1; strncpy(m_cda.message,"cursor not open.\n",128); return -1;
+  }
+
   if ( (position<1) || (position>=MAXPARAMS) || (position>m_handle->param_count) )
   {
     m_cda.rc=-1; strncpy(m_cda.message,"array bound.",128);
@@ -553,7 +586,7 @@ int sqlstatement::bindinlob(unsigned int position,void *buffer,unsigned long *fi
 
   params_in[position-1].buffer_type = MYSQL_TYPE_BLOB;
   params_in[position-1].buffer = buffer;
-  params_in[position-1].length=filesize;
+  params_in[position-1].length=size;
   params_in[position-1].is_null=&params_in_is_null[position-1];
 
   if (position>maxbindin) maxbindin=position;
@@ -563,6 +596,11 @@ int sqlstatement::bindinlob(unsigned int position,void *buffer,unsigned long *fi
 
 int sqlstatement::bindin(unsigned int position,float *value)
 {
+  if (m_state == 0)
+  {
+    m_cda.rc=-1; strncpy(m_cda.message,"cursor not open.\n",128); return -1;
+  }
+
   if ( (position<1) || (position>=MAXPARAMS) || (position>m_handle->param_count) )
   {
     m_cda.rc=-1; strncpy(m_cda.message,"array bound.",128);
@@ -578,6 +616,11 @@ int sqlstatement::bindin(unsigned int position,float *value)
 
 int sqlstatement::bindin(unsigned int position,double *value)
 {
+  if (m_state == 0)
+  {
+    m_cda.rc=-1; strncpy(m_cda.message,"cursor not open.\n",128); return -1;
+  }
+
   if ( (position<1) || (position>=MAXPARAMS) || (position>m_handle->param_count) )
   {
     m_cda.rc=-1; strncpy(m_cda.message,"array bound.",128);
@@ -594,6 +637,11 @@ int sqlstatement::bindin(unsigned int position,double *value)
 ///////////////////
 int sqlstatement::bindout(unsigned int position,int *value)
 {
+  if (m_state == 0)
+  {
+    m_cda.rc=-1; strncpy(m_cda.message,"cursor not open.\n",128); return -1;
+  }
+
   if ( (position<1) || (position>=MAXPARAMS) || (position>m_handle->field_count) )
   {
     m_cda.rc=-1; strncpy(m_cda.message,"array bound.",128);
@@ -607,6 +655,11 @@ int sqlstatement::bindout(unsigned int position,int *value)
 
 int sqlstatement::bindout(unsigned int position,long *value)
 {
+  if (m_state == 0)
+  {
+    m_cda.rc=-1; strncpy(m_cda.message,"cursor not open.\n",128); return -1;
+  }
+
   if ( (position<1) || (position>=MAXPARAMS) || (position>m_handle->field_count) )
   {
     m_cda.rc=-1; strncpy(m_cda.message,"array bound.",128);
@@ -620,6 +673,11 @@ int sqlstatement::bindout(unsigned int position,long *value)
 
 int sqlstatement::bindout(unsigned int position,unsigned int *value)
 {
+  if (m_state == 0)
+  {
+    m_cda.rc=-1; strncpy(m_cda.message,"cursor not open.\n",128); return -1;
+  }
+
   if ( (position<1) || (position>=MAXPARAMS) || (position>m_handle->field_count) )
   {
     m_cda.rc=-1; strncpy(m_cda.message,"array bound.",128);
@@ -633,6 +691,11 @@ int sqlstatement::bindout(unsigned int position,unsigned int *value)
 
 int sqlstatement::bindout(unsigned int position,unsigned long *value)
 {
+  if (m_state == 0)
+  {
+    m_cda.rc=-1; strncpy(m_cda.message,"cursor not open.\n",128); return -1;
+  }
+
   if ( (position<1) || (position>=MAXPARAMS) || (position>m_handle->field_count) )
   {
     m_cda.rc=-1; strncpy(m_cda.message,"array bound.",128);
@@ -646,6 +709,11 @@ int sqlstatement::bindout(unsigned int position,unsigned long *value)
 
 int sqlstatement::bindout(unsigned int position,char *value,unsigned int len)
 {
+  if (m_state == 0)
+  {
+    m_cda.rc=-1; strncpy(m_cda.message,"cursor not open.\n",128); return -1;
+  }
+
   if ( (position<1) || (position>=MAXPARAMS) || (position>m_handle->field_count) )
   {
     m_cda.rc=-1; strncpy(m_cda.message,"array bound.",128);
@@ -658,15 +726,20 @@ int sqlstatement::bindout(unsigned int position,char *value,unsigned int len)
   return 0;
 }
 
-int sqlstatement::bindoutlob(unsigned int position,void *buffer,unsigned long buffersize,unsigned long *filesize)
+int sqlstatement::bindoutlob(unsigned int position,void *buffer,unsigned long buffersize,unsigned long *size)
 {
+  if (m_state == 0)
+  {
+    m_cda.rc=-1; strncpy(m_cda.message,"cursor not open.\n",128); return -1;
+  }
+
   if ( (position<1) || (position>=MAXPARAMS) || (position>m_handle->field_count) )
   {
     m_cda.rc=-1; strncpy(m_cda.message,"array bound.",128);
   }
 
   params_out[position-1].buffer_type = MYSQL_TYPE_BLOB;
-  params_out[position-1].length = filesize;
+  params_out[position-1].length = size;
   params_out[position-1].buffer = buffer;
   params_out[position-1].buffer_length = buffersize;
 
@@ -676,6 +749,11 @@ int sqlstatement::bindoutlob(unsigned int position,void *buffer,unsigned long bu
 
 int sqlstatement::bindout(unsigned int position,float *value)
 {
+  if (m_state == 0)
+  {
+    m_cda.rc=-1; strncpy(m_cda.message,"cursor not open.\n",128); return -1;
+  }
+
   if ( (position<1) || (position>=MAXPARAMS) || (position>m_handle->field_count) )
   {
     m_cda.rc=-1; strncpy(m_cda.message,"array bound.",128);
@@ -689,6 +767,11 @@ int sqlstatement::bindout(unsigned int position,float *value)
 
 int sqlstatement::bindout(unsigned int position,double *value)
 {
+  if (m_state == 0)
+  {
+    m_cda.rc=-1; strncpy(m_cda.message,"cursor not open.\n",128); return -1;
+  }
+
   if ( (position<1) || (position>=MAXPARAMS) || (position>m_handle->field_count) )
   {
     m_cda.rc=-1; strncpy(m_cda.message,"array bound.",128);
@@ -725,7 +808,7 @@ int sqlstatement::execute()
     }
   }
   
-  // ´¦Àí×Ö·û´®×Ö¶ÎÎª¿ÕµÄÇé¿ö¡£
+  // å¤„ç†å­—ç¬¦ä¸²å­—æ®µä¸ºç©ºçš„æƒ…å†µã€‚
   for (int ii=0;ii<maxbindin;ii++)
   {
     if (params_in[ii].buffer_type == MYSQL_TYPE_VAR_STRING )
@@ -752,10 +835,14 @@ int sqlstatement::execute()
 
   if (mysql_stmt_execute(m_handle) != 0)
   {
-    err_report(); return m_cda.rc;
+    err_report(); 
+
+    if (m_cda.rc==1243) memcpy(&m_cda,&m_cda1,sizeof(struct CDA_DEF));
+
+    return m_cda.rc;
   }
   
-  // Èç¹û²»ÊÇ²éÑ¯Óï¾ä£¬¾Í»ñÈ¡Ó°Ïì¼ÇÂ¼µÄĞĞÊı
+  // å¦‚æœä¸æ˜¯æŸ¥è¯¢è¯­å¥ï¼Œå°±è·å–å½±å“è®°å½•çš„è¡Œæ•°
   if (m_sqltype == 1) 
   { 
     m_cda.rpc=m_handle->affected_rows;
@@ -787,16 +874,16 @@ int sqlstatement::execute(const char *fmt,...)
 
 int sqlstatement::next()
 {
-  // ×¢Òâ£¬ÔÚ¸Ãº¯ÊıÖĞ£¬²»¿ÉËæÒâÓÃmemset(&m_cda,0,sizeof(m_cda))£¬·ñÔò»áÇå¿Õm_cda.rpcµÄÄÚÈİ
+  // æ³¨æ„ï¼Œåœ¨è¯¥å‡½æ•°ä¸­ï¼Œä¸å¯éšæ„ç”¨memset(&m_cda,0,sizeof(m_cda))ï¼Œå¦åˆ™ä¼šæ¸…ç©ºm_cda.rpcçš„å†…å®¹
   if (m_state == 0)
   {
     m_cda.rc=-1; strncpy(m_cda.message,"cursor not open.\n",128); return -1;
   }
   
-  // Èç¹ûÓï¾äÎ´Ö´ĞĞ³É¹¦£¬Ö±½Ó·µ»ØÊ§°Ü¡£
+  // å¦‚æœè¯­å¥æœªæ‰§è¡ŒæˆåŠŸï¼Œç›´æ¥è¿”å›å¤±è´¥ã€‚
   if (m_cda.rc != 0) return m_cda.rc;
   
-  // ÅĞ¶ÏÊÇ·ñÊÇ²éÑ¯Óï¾ä£¬Èç¹û²»ÊÇ£¬Ö±½Ó·µ»Ø´íÎó
+  // åˆ¤æ–­æ˜¯å¦æ˜¯æŸ¥è¯¢è¯­å¥ï¼Œå¦‚æœä¸æ˜¯ï¼Œç›´æ¥è¿”å›é”™è¯¯
   if (m_sqltype != 0)
   {
     m_cda.rc=-1; strncpy(m_cda.message,"no recordset found.\n",128); return -1;
@@ -824,8 +911,8 @@ int sqlstatement::next()
   return 0;
 }
 
-// °ÑÎÄ¼şfilename¼ÓÔØµ½bufferÖĞ£¬±ØĞëÈ·±£buffer×ã¹»´ó¡£
-// ³É¹¦·µ»ØÎÄ¼şµÄ´óĞ¡£¬ÎÄ¼ş²»´æÔÚ»òÎª¿Õ·µ»Ø0¡£
+// æŠŠæ–‡ä»¶filenameåŠ è½½åˆ°bufferä¸­ï¼Œå¿…é¡»ç¡®ä¿bufferè¶³å¤Ÿå¤§ã€‚
+// æˆåŠŸè¿”å›æ–‡ä»¶çš„å¤§å°ï¼Œæ–‡ä»¶ä¸å­˜åœ¨æˆ–ä¸ºç©ºè¿”å›0ã€‚
 unsigned long filetobuf(const char *filename,char *buffer)
 {
   FILE *fp;
@@ -848,11 +935,11 @@ unsigned long filetobuf(const char *filename,char *buffer)
   return total_bytes;
 }
 
-// °ÑbufferÖĞµÄÄÚÈİĞ´ÈëÎÄ¼şfilename£¬buffersizeÎªbufferµÄ´óĞ¡¡£
-// ³É¹¦·µ»Øtrue£¬Ê§°Ü·µ»Øfalse¡£
-bool buftofile(const char *filename,char *buffer,unsigned long buffersize)
+// æŠŠbufferä¸­çš„å†…å®¹å†™å…¥æ–‡ä»¶filenameï¼Œsizeä¸ºbufferä¸­æœ‰æ•ˆå†…å®¹çš„å¤§å°ã€‚      
+// æˆåŠŸè¿”å›trueï¼Œå¤±è´¥è¿”å›falseã€‚
+bool buftofile(const char *filename,char *buffer,unsigned long size)
 {
-  if (buffersize==0) return false;
+  if (size==0) return false;
 
   char filenametmp[301];
   memset(filenametmp,0,sizeof(filenametmp));
@@ -862,10 +949,10 @@ bool buftofile(const char *filename,char *buffer,unsigned long buffersize)
 
   if ( (fp=fopen(filenametmp,"w")) ==0 ) return false;
 
-  // Èç¹ûbuffer±È½Ï´ó£¬¿ÉÄÜ´æÔÚÒ»´Îwrite²»ÍêµÄÇé¿ö£¬ÒÔÏÂ´úÂë¿ÉÒÔÓÅ»¯³ÉÓÃÒ»¸öÑ­»·Ğ´Èë¡£
-  size_t tt=fwrite(buffer,1,buffersize,fp);
+  // å¦‚æœbufferæ¯”è¾ƒå¤§ï¼Œå¯èƒ½å­˜åœ¨ä¸€æ¬¡writeä¸å®Œçš„æƒ…å†µï¼Œä»¥ä¸‹ä»£ç å¯ä»¥ä¼˜åŒ–æˆç”¨ä¸€ä¸ªå¾ªç¯å†™å…¥ã€‚
+  size_t tt=fwrite(buffer,1,size,fp);
 
-  if (tt!=buffersize)
+  if (tt!=size)
   {
     remove(filenametmp); return false;
   }
